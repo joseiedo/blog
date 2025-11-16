@@ -13,48 +13,33 @@ const blog = await getRecentPosts(SITE.featuredPostCount)
 <Layout class="max-w-3xl">
   <PageHead slot="head" title="Home" />
   <section class="rounded-lg border">
-    <div class="flex flex-col space-y-1.5 p-6">
-      <h3 class="text-3xl leading-none font-medium">er·u·dite</h3>
-      <p class="text-muted-foreground text-sm">
-        /ˈer(y)əˌdīt/ &bull; <span class="font-medium">adjective</span>
-      </p>
-    </div>
-    <div class="p-6 pt-0">
+    <div class="p-6">
       <p class="text-muted-foreground mb-2 text-sm">
-        astro-erudite is an opinionated, unstyled static blogging template built
-        with <Link
-          href="https://astro.build"
-          class="text-foreground"
-          external
-          underline>Astro</Link
-        >, <Link
-          href="https://tailwindcss.com"
-          class="text-foreground"
-          external
-          underline>Tailwind</Link
-        >, and <Link
-          href="https://ui.shadcn.com"
-          class="text-foreground"
-          external
-          underline>shadcn/ui</Link
-        >. Extraordinarily loosely based on the <Link
-          href="https://astro-micro.vercel.app/"
-          class="text-foreground"
-          external
-          underline>Astro Micro</Link
-        > theme.
+        I don't know what to write here. I started writing to see if I would
+        improve my english writing (and reasoning) skills. No idea if it's
+        working, but I think my posts are improving.
       </p>
-      <p class="text-muted-foreground text-sm">
-        To use this template, check out the <Link
-          href="https://github.com/jktrn/astro-erudite"
+      <p class="text-muted-foreground text-sm">Some facts about me:</p>
+      <ul class="text-muted-foreground text-sm list-disc pl-5 mb-2">
+        <li>My favorite fruit is Mango</li>
+        <li>I try to draw and play guitar sometimes</li>
+        <li>I'm a Brazilian with no good social skills</li>
+      </ul>
+      <p class="text-muted-foreground mb-2 text-sm">
+        For now, I'm writing technical content that helps me or I can share with
+        another person if it's a concept I don't have energy to answer again.
+      </p>
+      <p class="text-muted-foreground mb-2 text-sm">
+        You can find me on <Link
+          external
           class="text-foreground"
           underline
-          external>GitHub</Link
-        > repository. To learn more about why this template exists, read this blog
-        post: <Link
-          href="/blog/the-state-of-static-blogs"
+          href="https://github.com/joseiedo">GitHub</Link
+        > and <Link
+          external
           class="text-foreground"
-          underline>The State of Static Blogs in 2024</Link
+          underline
+          href="https://www.linkedin.com/in/joseiedo/">LinkedIn</Link
         >.
       </p>
     </div>

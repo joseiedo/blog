@@ -1,0 +1,393 @@
+---
+title: A brief overview of Maven
+description: ""
+date: 2025-11-14
+tags:
+  - java
+  - maven
+image: ""
+draft: false
+authors:
+  - iedo
+---
+
+import Callout from '@/components/Callout.astro'
+
+<Callout variant="definition">
+Maven is a dependency and build manager for Java (or java derivative languages like Kotlin) applications. It simplifies A LOT the workflow of building your app, managing dependencies, executing tests and overall development workflow.
+</Callout>
+
+# How dependency management works?
+During the Ice Age, when java developers had to use external libraries in their java project like **OkHttp** it was necessary to download each dependency jar.
+The  project folder structure was like this:
+```txt
+lib/
+├─ okhttp.jar
+├─ jackson.jar
+src/
+├─ AnotherClass.java
+├─ Main.java
+```
+
+To build this project it was necessary to pass all .jar files to javac compiler
+```bash
+javac -cp "lib/*" -d out $(find src -name "*.java")
+```
+
+Although this makes you feel like a hacker, it's very annoying because:
+- Developers could have different environments (the find command I used here wouldn't work on Windows, for example)
+- Updating dependencies required manual search and download (again)
+- Unless your team was well organized, you needed to figure out on your own which .jar version was the correct
+- Multiple libraries required different versions of the same dependency
+
+and more...
+
+With **Maven** it's as simple as:
+
+1. Search for you dependency on [Maven Repository](https://mvnrepository.com/), choose a version.
+2. For example, in the [JavaFX](https://mvnrepository.com/artifact/org.openjfx/javafx-graphics/26-ea+16) dependency page, you will see something like this:
+```xml
+<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
+<dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-graphics</artifactId>
+    <version>21.0.1</version>
+</dependency>
+```
+3. Copy this inside of a *\<dependencies\>* tag inside your **pom.xml** file (will talk about this file more in [The POM configuration file](#the-pom-configuration-file) section)
+```xml title="pom.xml"
+<project>
+    <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>21.0.1</version>
+        </dependency>
+    </dependencies>
+</project>
+```
+4. Now, just run **dependency:resolve** and Maven will download all dependencies :)
+
+```bash
+~/
+$ ls
+Main.java pom.xml
+
+~/
+$ mvn dependency:resolve
+```
+
+## Where are my JARs?
+
+After Maven downloads each dependency defined in your POM file, it will cache in the **local repository**, which is just a folder in your computer.
+```bash
+cd ~/.m2/repository  # Local repository
+cd ~/.m2/repository/org/openjfx/javafx-graphics/21.0.2/ #  Location of the JavaFX jar I showed in this example
+```
+
+<Callout title="about repositories" variant="remark">
+  [Maven Repository](https://mvnrepository.com/)  is not the only place to download dependencies. I used [Github Packages](https://docs.github.com/en/packages)
+  but there are others like [Nexus Repository](https://www.sonatype.com/products/sonatype-nexus-repository),
+  so if your company has private packages this is a solution to use them in different projects.
+</Callout>
+
+## Maven Lifecycles
+
+Maven has very useful commands like:
+```bash
+# compiles the app (no shit?)
+mvn compile
+
+# Remove build artifacts
+mvn clean
+
+# Compile your app and move it to the local repository, making it available for other local projects
+mvn install
+```
+
+These commands like compile, validate, clear are all called **lifecyle phases**. Maven divides these phases between three lifecycles:  **default, clean and site.**
+
+For example, the **default** cycle is composed with around 23+ phases. Here is the first 7:
+
+| Phase                  | Description                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| **validate**           | Validate the project is correct and all necessary information is available.         |
+| **initialize**         | Initialize build state, e.g. set properties or create directories.                  |
+| **generate-sources**   | Generate any source code for inclusion in compilation.                              |
+| **process-sources**    | Process the source code, for example to filter any values.                          |
+| **generate-resources** | Generate resources for inclusion in the package.                                    |
+| **process-resources**  | Copy and process the resources into the destination directory, ready for packaging. |
+| **compile**            | Compile the source code of the project.                                             |
+
+
+When running any phase, all phases before of it will also be executed.
+E.g. If you run **mvn compile** it will run validate, initialize, generate-sources, process-sources etc... until process-resources, **finishing with the compile phase**.
+
+<Callout variant="exercise">
+  Go to the official [Maven Documentation](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#:~:text=top.-,Lifecycle%20Reference,-The%20following%20lists) and see how many phases run before `mvn install`. You can even see all of this information when running `mvn install -X`
+</Callout>
+
+# The POM configuration file
+**POM** (Project Object Model) is the configuration file Maven uses to understand your project structure, which dependencies to download, how to build the code, etc.
+The POM file is written in [XML](https://en.wikipedia.org/wiki/XML#:~:text=Extensible%20Markup%20Language%20(XML)%20is%20a%20markup%20language%20and%20file%20format%20for%20storing%2C%20transmitting%2C%20and%20reconstructing%20data.). It's like a JSON but with more capabilities and the usage of tags with attributes (like HTML).
+
+```xml title="example.xml"
+<exampleTag>
+  <dataContainer>
+    <value key="identifier"/>
+  </dataContainer>
+</exampleTag>
+```
+
+## Project Info
+
+The root element of every Maven POM is the **\<project\>** tag, containing **XML attributes** that allow your code editor and Maven to validate the file against an official [schema](https://www.w3schools.com/xml/schema_intro.asp).
+
+- The **xmlns** attribute defines the default namespace for the whole xml file (so Maven knows which tag to use as a starting point)
+- The remaining **xmlns:xsi** and **xsi:schemaLocation** are attributes used to define the schema we're using. It's helpful because our code editors and Maven can validate the xml before everything.
+
+There is also another tags inside the project, providing information about the project.
+```xml title="pom.xml"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- POM model version  -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Group identifier for the project.
+         Typically, uses the reversed domain name of the organization.
+         Used to group related projects under the same namespace. -->
+    <groupId>com.joseiedo</groupId>
+
+    <!-- Unique name of this artifact within the group.
+         Convention for public artifacts: lowercase letters, digits, hyphens. -->
+    <artifactId>maven-in-a-nutshell</artifactId>
+
+    <!-- Version of the produced artifact.
+         Usually follows Semantic Versioning 2.0.0.
+         “-ALPHA” indicates a pre-release. -->
+    <version>1.0.0-ALPHA</version>
+
+</project>
+```
+
+Now, if you want, you can check if the configuration is valid by running **mvn validate** in the same directory.
+
+```bash
+~/
+$ ls
+pom.xml
+
+~/
+$ mvn validate
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.joseiedo:maven-in-a-nutshell >------------------
+[INFO] Building maven-in-a-nutshell 1.0.0-ALPHA
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.032 s
+[INFO] Finished at: 2025-11-14T21:48:32-03:00
+[INFO] ------------------------------------------------------------------------
+
+
+```
+
+
+## Build properties
+
+Here is where things get fun! Building a java application using javac is really boring for big projects, although you can simplify with bash, it's still a pain in the ass to do this for every project.
+
+With Maven, **we just need to provide the source directory in the pom.xml**!
+
+1. Create a Main.java file in the same folder of your pom.xml with the following code:
+```java title="Main.java"
+public class Main {
+
+    public static void main(String[] args) {
+        System.out.println("Olá");
+    }
+}
+```
+2. Now, update your pom.xml adding the build information
+
+```xml title="pom.xml" ins={7-10} collapse={2-5}
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.joseiedo</groupId>
+    <artifactId>maven-in-a-nutshell</artifactId>
+    <version>1.0.0-ALPHA</version>
+
+    <build>
+        <!-- The default is src/main/java but let's change for this example ;) -->
+        <sourceDirectory>.</sourceDirectory>
+    </build>
+</project>
+```
+3. Run **mvn compile** and see your compiled code inside the **target** folder!
+```bash collapse={5-31}
+~/
+$ ls
+Main.java pom.xml
+
+~/
+$ mvn compile
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.joseiedo:maven-in-a-nutshell >------------------
+[INFO] Building maven-in-a-nutshell 1.0.0-ALPHA
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ maven-in-a-nutshell ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /Users/iedo/Study/maven/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ maven-in-a-nutshell ---
+[INFO] Recompiling the module because of changed source code.
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 1 source file with javac [debug target 1.8] to target/classes
+[WARNING] bootstrap class path not set in conjunction with -source 8
+[WARNING] source value 8 is obsolete and will be removed in a future release
+[WARNING] target value 8 is obsolete and will be removed in a future release
+[WARNING] To suppress warnings about obsolete options, use -Xlint:-options.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.306 s
+[INFO] Finished at: 2025-11-14T22:08:15-03:00
+[INFO] ------------------------------------------------------------------------
+
+~/
+$ ls
+Main.java pom.xml   target
+
+```
+
+Under the hood, maven use one of its **plugins** to run **javac** automatically passing diverse values that can also be configured in this POM (like **source** and **target**) respectively defining java version for source code and artifact.
+
+### Build plugins
+Frameworks like Quarkus and Spring has their own build plugins to make your life easier, and you can use them in your project. Here is an example using **spring-maven-plugin**:
+```xml title="pom.xml"
+<project>
+    <!--- omitted details -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+```
+
+This plugin gives you commands like `mvn springboot:run` that executes your Spring backend and others that make building a Jar file easier.
+
+## Maven multi-module
+I like multi-module architecture, and it's very common to see big open source projects using it because of the flexibility you can achieve. I made an example for Quarkus, and it's available [on GitHub](https://github.com/joseiedo/quarkus-multi-module-example).
+
+So, here is the walkthrough!
+
+1. Define a parent pom.xml
+2. Add a pom.xml for each module you have. At this point the folder structure should be like this:
+```txt
+.
+├── moduleA/
+│   └── pom.xml
+├── moduleB/
+│   └── pom.xml
+├── moduleC/
+│   └── pom.xml
+└── pom.xml <- parent
+```
+
+3. In the parent pom.xml, declare your modules
+```xml title="PARENT pom.xml"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Every module must have this POM as the "parent" -->
+    <groupId>com.joseiedo</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-ALPHA</version>
+
+    <modules>
+        <!-- The artifactId of each module pom.xml should be here -->
+        <module>module-a</module>
+        <module>module-b</module>
+        <module>module-c</module>
+    </modules>
+
+    <!-- Parent POMs must have packaging = POM -->
+    <packaging>pom</packaging>
+
+</project>
+```
+4. In every module add the parent pom.xml
+```xml title="moduleA/pom.xml" {9-13}
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+    <artifactId>module-a</artifactId>
+	<version>1.0.0-ALPHA</version>
+
+	<parent>
+		<groupId>com.joseiedo</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0-ALPHA</version>
+	</parent>
+</project>
+```
+5. If you have a module depending on another, just add it as a dependency:
+```xml title="moduleB/pom.xml" {11-16}
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+    <artifactId>module-b</artifactId>
+	<version>1.0.0-ALPHA</version>
+
+    <!-- ... -->
+
+	<dependencies>
+		<dependency>
+			<groupId>com.joseiedo</groupId>
+			<artifactId>module-a</artifactId>
+		</dependency>
+	</dependencies>
+</project>
+
+```
+Maven treats every project/module as a package, so if you have modules depending on each other, run **mvn install** in the dependency project to compile and be placed in your **local repository**, being available to the modules depending on it.
+
+<Callout variant="tip">
+ If you want to run a command for a specific module, use **-pl**.
+```bash
+mvn quarkus:dev -pl module-a
+mvn install -pl module-b
+```
+  Find other flags with `mvn --help`
+</Callout>
+
+It's useful to have a parent pom.xml because:
+1. You can run build and other commands like `mvn install` in the root of the project, and all modules will run the command.
+2. You store common dependencies versions through `<dependencyManagement>` tag, also adding build plugins to all modules at the same time and all modules will inherit it, without making you update the used versions everywhere.
+
+# Going forward from here
+
+There is a lot of properties I didn't cover here but at this point I think it would be only me being a proxy for the documentation but writing with my words...
+For a full list of the possible properties you can use in your pom.xml, go for the [documentation](https://maven.apache.org/ref/3.9.11/maven-model/maven.html), write PoCs and test on your own, this is the best way to learn.
+
+Other tools like gradle follows the same principle (changing the way to config and having bonus features), but the overall knowledge is reusable, so I think it's worth to learn a bit about it.
+
+So... bye and see you in the next post.
