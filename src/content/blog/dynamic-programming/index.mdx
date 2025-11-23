@@ -1,0 +1,160 @@
+---
+title: Introduction to Dynamic Programming
+description: "Have a big shit to solve, split everything in small solvable shits!"
+date: 2025-11-22
+tags:
+  - algorithms
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+import Callout from '@/components/Callout.astro'
+
+<Callout variant="definition">
+Dynamic programming is a method of solving problems simplifying a problem by breaking it down into related sub-problems solving in a recursive manner, like the
+  [Fibonacci Sequence](https://en.wikipedia.org/wiki/Fibonacci_sequence).
+
+
+$$
+
+F(n) =
+\begin{cases}
+0 & \text{if } n = 0, \\
+1 & \text{if } n = 1, \\
+F(n-1) + F(n-2), & \text{if } n \ge 2.
+\end{cases}
+$$
+</Callout>
+
+
+## Optimal Substructure
+
+Every DP problem has an optimal substructure.
+This means that the **optimal solution to the overall problem can be constructed by combining optimal solutions to its subproblems.**
+
+<Callout variant="example" title="of optimal substructures">
+
+**Fibonacci Sequence**
+* **Base Cases:** $F(0) = 0$ and $F(1) = 1$.
+* **Recurrence Relation:**
+    $$
+    F(n) = F(n-1) + F(n-2)
+    $$
+
+To find the **optimal value** of $F(n)$, we **must** first find the optimal values of the two smaller subproblems,
+  $F(n-1)$ and $F(n-2)$.
+
+**Floyd–Warshall All-Pairs Shortest Path Algorithm**
+
+This algorithm relies on the idea that any shortest path has a shortest substructure.
+
+* **Intuition:** The shortest path from node $i$ to $j$ using only intermediate nodes from the set $\{1, 2, \dots, k\}$ is denoted $d_k[i][j]$.
+* **Recurrence Relation:**
+    $$
+    d_k[i][j] = \min\big( \underbrace{d_{k-1}[i][j]}_{\text{Path does NOT use } k};
+    \quad \underbrace{d_{k-1}[i][k] + d_{k-1}[k][j]}_{\text{Path DOES use } k} \big)
+    $$
+
+This recurrence shows that the best path is built by comparing two options: the current best path, or a new path composed
+  of two smaller **subpaths** (shortest path from $i$ to $k$ and shortest path from $k$ to $j$),
+  all of which were previously solved optimally in the $(k-1)$ iteration.
+
+Explaining this algorithm is out of scope here, so for a walkthrough you can refer to the video: [Floyd Warshall All Pairs Shortest Path Algorithm | Graph Theory | Dynamic Programming](https://www.youtube.com/watch?v=4NQ3HnhyNfQ).)*
+
+</Callout>
+
+
+## Overlapping Subproblems
+A DP-friendly problem repeatedly solves the same subproblems instead of generating new ones.
+This can be solved through memoization, but it's a common characteristic of these algorithms.
+
+<Callout variant="example" title="of overlapping subproblems">
+
+**Fibonacci Sequence**
+
+Using the Fibonacci recursive formula, we repeat calculations:
+```
+F(5) = F(4) + F(3)
+F(4) = F(3) + F(2)
+F(3) = F(2) + F(1)
+...
+```
+
+<Callout variant="remark">
+Overlapping Subproblems is different than the **dividing and conquering** approach of Merge Sort. It divides into subproblems but they **don't overlap**.
+</Callout>
+
+</Callout>
+
+## Top-down with memoization implementation
+
+The strategy used for the fibonacci example is called **top-down**.
+This is because we start the computation from the top of the problem (the n-th position)
+and recursively move downward to smaller subproblems. Once the base cases are reached,
+we combine the results as the recursion unwinds back toward the top.
+
+```java
+public HashMap<Integer, Integer> cache = new HashMap<>();
+
+public int fib(int n) {
+   if (n < 2) return n;
+   if (cache.containsKey(n)) return cache.get(n); // Memoization to avoid re-calculations
+   int result = fib(n - 1) + fib(n - 2);
+   cache.put(n, result);
+   return result;
+}
+```
+
+## Bottom-up with tabulation implementation
+
+Think about the **smallest subproblems** and iteratively build up to the solution,
+adding the solutions of each subproblem in an array, getting the last item as the result.
+
+Returning to the Fibonacci example, when you want to have the N number of the sequence,
+the **smallest subproblem** is **to get the 1st number of the sequence** (after 0 and 1)
+
+```java
+int[] sequence = new int[3] 
+sequence[0] = 0;
+sequence[1] = 1;
+// 1st number fib(n)
+sequence[2] = sequence[1] + sequence[0]; 
+```
+
+Now repeat the solution of the subproblem for the next steps with a loop while storing past results in your tabulation array:
+```java ins={5-7}
+int[] sequence = new int[N + 1] 
+sequence[0] = 0;
+sequence[1] = 1;
+
+for (int i = 2; i <= N; i++) {
+	sequence[i] = sequence[i - 1] + sequence[i - 2];
+}
+
+int result = sequence[N]
+```
+
+
+<Callout variant={"tip"}>
+Since only the last 2 numbers are necessary, It's possible to remove this tabulation array to make this function O(1) in space, just replace it with 2 variables.
+```java ins={1-2, 5-7}
+int previous = 0;
+int current = 1;
+
+for (int i = 2; i <= N; i++) {
+	int temp = current;
+	current = previous + current;
+	previous = temp;
+}
+
+return current;
+```
+
+</Callout>
+
+## Going from here...
+
+Solve leetcode problems by filtering for the dynamic programming tag, the algomap.io/roadmap is a good source for this.
+Good for me (and for you, if you're reading this)
