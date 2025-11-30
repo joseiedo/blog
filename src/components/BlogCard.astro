@@ -53,7 +53,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
       <div
         class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-2 text-xs"
       >
-        {
+        <!-- {
           authors.length > 0 && (
             <>
               {authors.map((author) => (
@@ -71,7 +71,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
               <Separator orientation="vertical" className="h-4!" />
             </>
           )
-        }
+        } -->
         <span>{formattedDate}</span>
         <Separator orientation="vertical" className="h-4!" />
         <span>{readTime}</span>
