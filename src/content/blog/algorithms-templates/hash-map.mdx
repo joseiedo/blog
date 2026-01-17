@@ -1,0 +1,63 @@
+---
+title: Hash Map Patterns
+description: "Hash map patterns for counting subarrays and sliding window with sets"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - hash-map
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Find Number of Subarrays
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+
+public int fn(int[] arr, int k) {
+    Map<Integer, Integer> counts = new HashMap<>();
+    counts.put(0, 1);
+    int ans = 0;
+    int curr = 0;
+
+    for (int num: arr) {
+        // TODO: logic to change curr
+        ans += counts.getOrDefault(curr - k, 0);
+        counts.put(curr, counts.getOrDefault(curr, 0) + 1);
+    }
+
+    return ans;
+}
+```
+
+## Sliding Window with HashSet
+
+```java
+import java.util.HashSet;
+import java.util.Set;
+
+
+public int fn(int[] arr) {
+    Set<Integer> window = new HashSet<>();
+    int ans = 0;
+    int left = 0;
+
+    for (int right = 0; right < arr.length; right++) {
+        // TODO: add arr[right] to window
+
+        while (WINDOW_CONDITION_BROKEN) {
+            // TODO: remove arr[left] from window
+            left++;
+        }
+
+        // TODO: update ans
+    }
+
+    return ans;
+}
+```

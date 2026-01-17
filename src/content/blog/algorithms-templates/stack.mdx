@@ -1,0 +1,58 @@
+---
+title: Stack Patterns
+description: "Monotonic stack patterns for increasing and decreasing sequences"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - stack
+  - monotonic-stack
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Monotonic Decreasing Stack
+
+```java
+import java.util.Stack;
+
+
+public int fn(int[] arr) {
+    Stack<Integer> stack = new Stack<>();
+    int ans = 0;
+
+    for (int num : arr) {
+        while (!stack.isEmpty() && stack.peek() < num) {
+            // TODO: logic
+            stack.pop();
+        }
+        stack.push(num);
+    }
+
+    return ans;
+}
+```
+
+## Monotonic Increasing Stack
+
+```java
+import java.util.Stack;
+
+
+public int fn(int[] arr) {
+    Stack<Integer> stack = new Stack<>();
+    int ans = 0;
+
+    for (int num : arr) {
+        while (!stack.isEmpty() && stack.peek() > num) {
+            // TODO: logic
+            stack.pop();
+        }
+        stack.push(num);
+    }
+
+    return ans;
+}
+```

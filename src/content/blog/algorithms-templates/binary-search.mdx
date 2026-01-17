@@ -1,0 +1,130 @@
+---
+title: Binary Search
+description: "Binary search templates including standard search and variants for duplicate elements"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - binary-search
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Standard Binary Search
+
+```java
+public int fn(int[] arr, int target) {
+    int left = 0;
+    int right = arr.length - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] == target) {
+            // TODO: logic
+            return mid;
+        }
+        if (arr[mid] > target) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return left;
+}
+```
+
+## Duplicate Elements: Left Insertion
+
+```java
+public int fn(int[] arr, int target) {
+    int left = 0;
+    int right = arr.length;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] >= target) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return left;
+}
+```
+
+## Duplicate Elements: Right Insertion
+
+```java
+public int fn(int[] arr, int target) {
+    int left = 0;
+    int right = arr.length;
+
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] > target) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return left;
+}
+```
+
+## Greedy Maximum
+
+```java
+public int fn(int[] arr) {
+    int left = MINIMUM_POSSIBLE_ANSWER;
+    int right = MAXIMUM_POSSIBLE_ANSWER;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (check(mid)) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return right;
+}
+
+public boolean check(int x) {
+    return BOOLEAN
+}
+```
+
+## Greedy Minimum
+
+```java
+public int fn(int[] arr) {
+    int left = MINIMUM_POSSIBLE_ANSWER;
+    int right = MAXIMUM_POSSIBLE_ANSWER;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (check(mid)) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return left;
+}
+
+public boolean check(int x) {
+    return BOOLEAN
+}
+```

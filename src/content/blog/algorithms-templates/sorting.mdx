@@ -1,0 +1,585 @@
+---
+title: Sorting Algorithms
+description: "Various sorting algorithm implementations from simple to advanced"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - sorting
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Bogo Sort
+
+```java
+import java.util.Arrays;
+import java.util.Random;
+
+
+public static void bogoSort(int[] arr) {
+    int[] target = Arrays.copyOf(arr, arr.length);
+    Arrays.sort(target);
+
+    while (!Arrays.equals(arr, target)) {
+        shuffleArray(arr);
+    }
+}
+
+public static void shuffleArray(int[] arr) {
+    Random rnd = new Random();
+
+    for (int i = arr.length - 1; i > 0; i--) {
+        int index = rnd.nextInt(i + 1);
+        int temp = arr[index];
+        arr[index] = arr[i];
+        arr[i] = temp;
+    }
+}
+```
+
+## Bubble Sort
+
+```java
+public static void bubbleSort(int[] arr) {
+    int n = arr.length;
+
+    for (int i = 0; i < n; i++) {
+        boolean swapped = false;
+
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                swapped = true;
+            }
+        }
+
+        if (!swapped) {
+            break;
+        }
+    }
+}
+```
+
+## Bucket Sort
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+
+public static int[] bucketSort(int[] arr) {
+    int numBuckets = 10;
+    int index;
+    int[] result = new int[arr.length];
+    int minNum = Arrays.stream(arr).min().getAsInt();
+    int maxNum = Arrays.stream(arr).max().getAsInt();
+    double bucketSize = (double) (maxNum - minNum) / numBuckets;
+    List<List<Integer>> buckets = new ArrayList<>(numBuckets);
+
+    for (int i = 0; i < numBuckets; i++) {
+        buckets.add(new ArrayList<>());
+    }
+
+    for (int num : arr) {
+        index = Math.min((int) ((num - minNum) / bucketSize), numBuckets - 1);
+        buckets.get(index).add(num);
+    }
+
+    index = 0;
+
+    for (List<Integer> bucket : buckets) {
+        Collections.sort(bucket);
+
+        for (int num : bucket) {
+            result[index++] = num;
+        }
+    }
+
+    return result;
+}
+```
+
+## Counting Sort
+
+```java
+import java.util.Arrays;
+
+
+public static int[] countingSort(int[] arr) {
+    int maxNum = Arrays.stream(arr).max().orElse(Integer.MIN_VALUE);
+    int minNum = Arrays.stream(arr).min().orElse(Integer.MAX_VALUE);
+    int countRange = maxNum - minNum + 1;
+    int[] count = new int[countRange];
+    int[] output = new int[arr.length];
+
+    for (int num : arr) {
+        count[num - minNum]++;
+    }
+
+    for (int i = 1; i < countRange; i++) {
+        count[i] += count[i - 1];
+    }
+
+    for (int i = arr.length - 1; i >= 0; i--) {
+        output[count[arr[i] - minNum] - 1] = arr[i];
+        count[arr[i] - minNum]--;
+    }
+
+    return output;
+}
+```
+
+## Cube Sort
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
+public static void cubeSort(int[] arr, int processors) {
+    int n = arr.length;
+    List<int[]> subarrays = new ArrayList<>();
+    int subarraySize = (n + processors - 1) / processors;
+
+    for (int i = 0; i < processors; i++) {
+        int[] subarray = new int[Math.min(subarraySize, n - i * subarraySize)];
+        System.arraycopy(arr, i * subarraySize, subarray, 0, subarray.length);
+        Arrays.sort(subarray);
+        subarrays.add(subarray);
+    }
+
+    for (int dimension = 0; dimension < Integer.SIZE - 1; dimension++) {
+        for (int i = 0; i < processors; i++) {
+            int partner = i ^ (1 << dimension);
+
+            if (i < partner && partner < processors) {
+                int[] merged = merge(subarrays.get(i), subarrays.get(partner));
+                System.arraycopy(merged, 0, subarrays.get(i), 0, subarraySize);
+                System.arraycopy(merged, subarraySize, subarrays.get(partner), 0, subarraySize);
+            }
+        }
+    }
+
+    int index = 0;
+
+    for (int[] subarray : subarrays) {
+        for (int num : subarray) {
+            arr[index++] = num;
+        }
+    }
+}
+
+public static int[] merge(int[] arr1, int[] arr2) {
+    int[] merged = new int[arr1.length + arr2.length];
+    int i = 0, j = 0, k = 0;
+
+    while (i < arr1.length && j < arr2.length) {
+        if (arr1[i] < arr2[j]) {
+            merged[k++] = arr1[i++];
+        } else {
+            merged[k++] = arr2[j++];
+        }
+    }
+
+    while (i < arr1.length) {
+        merged[k++] = arr1[i++];
+    }
+
+    while (j < arr2.length) {
+        merged[k++] = arr2[j++];
+    }
+
+    return merged;
+}
+```
+
+## Heap Sort
+
+```java
+public static int[] heapSort(int[] arr) {
+    int n = arr.length;
+
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(arr, n, i);
+    }
+
+    for (int i = n - 1; i > 0; i--) {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+
+        heapify(arr, i, 0);
+    }
+
+    return arr;
+}
+
+public static void heapify(int[] arr, int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest]) {
+        largest = left;
+    }
+    if (right < n && arr[right] > arr[largest]) {
+        largest = right;
+    }
+    if (largest != i) {
+        int temp = arr[i];
+        arr[i] = arr[largest];
+        arr[largest] = temp;
+
+        heapify(arr, n, largest);
+    }
+}
+```
+
+## Insertion Sort
+
+```java
+public static void insertionSort(int[] arr) {
+    int n = arr.length;
+
+    for (int i = 1; i < n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+
+        while (j >= 0 && key < arr[j]) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+
+        arr[j + 1] = key;
+    }
+}
+```
+
+## Merge Sort
+
+```java
+import java.util.Arrays;
+
+
+public static int[] mergeSort(int[] arr) {
+    int n = arr.length;
+
+    if (n <= 1) {
+        return arr;
+    }
+
+    int mid = n / 2;
+    int[] left = Arrays.copyOfRange(arr, 0, mid);
+    int[] right = Arrays.copyOfRange(arr, mid, n);
+
+    left = mergeSort(left);
+    right = mergeSort(right);
+
+    return merge(left, right);
+}
+
+public static int[] merge(int[] left, int[] right) {
+    int[] output = new int[left.length + right.length];
+    int i = 0, j = 0, k = 0;
+
+    while (i < left.length && j < right.length) {
+        if (left[i] <= right[j]) {
+            output[k++] = left[i++];
+        } else {
+            output[k++] = right[j++];
+        }
+    }
+
+    while (i < left.length) {
+        output[k++] = left[i++];
+    }
+
+    while (j < right.length) {
+        output[k++] = right[j++];
+    }
+
+    return output;
+}
+```
+
+## Pancake Sort
+
+```java
+public static void pancakeSort(int[] arr) {
+    int n = arr.length;
+
+    for (int size = n; size >= 2; size--) {
+        int maxIdx = findMaxIndex(arr, size);
+
+        if (maxIdx != size - 1) {
+            flip(arr, maxIdx);
+            flip(arr, size - 1);
+        }
+    }
+}
+
+public static void flip(int[] arr, int i) {
+    int left = 0;
+
+    while (left < i) {
+        int temp = arr[left];
+        arr[left] = arr[i];
+        arr[i] = temp;
+        left++;
+        i--;
+    }
+}
+
+public static int findMaxIndex(int[] arr, int n) {
+    int maxIdx = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (arr[i] > arr[maxIdx]) {
+            maxIdx = i;
+        }
+    }
+
+    return maxIdx;
+}
+```
+
+## Quick Sort
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+
+public static int[] quickSort(int[] arr) {
+    int n = arr.length;
+
+    if (n <= 1) {
+        return arr;
+    }
+
+    int pivot = arr[n / 2];
+    List<Integer> left = new ArrayList<>();
+    List<Integer> right = new ArrayList<>();
+
+    for (int x : arr) {
+        if (x < pivot) {
+            left.add(x);
+        } else if (x > pivot) {
+            right.add(x);
+        }
+    }
+
+    int[] sortedLeft = quickSort(left.stream().mapToInt(i -> i).toArray());
+    int[] sortedRight = quickSort(right.stream().mapToInt(i -> i).toArray());
+    int[] result = new int[n];
+
+    System.arraycopy(sortedLeft, 0, result, 0, sortedLeft.length);
+    result[sortedLeft.length] = pivot;
+    System.arraycopy(sortedRight, 0, result, sortedLeft.length + 1, sortedRight.length);
+
+    return result;
+}
+```
+
+## Radix Sort
+
+```java
+import java.util.Arrays;
+
+
+public static void radixSort(int[] arr) {
+    int maxVal = Arrays.stream(arr).max().getAsInt();
+    int exp = 1;
+
+    while (maxVal / exp > 0) {
+        countingSort(arr, exp);
+        exp *= 10;
+    }
+}
+
+public static void countingSort(int[] arr, int exp) {
+    int n = arr.length;
+    int[] output = new int[n];
+    int[] count = new int[10];
+
+    for (int i = 0; i < n; i++) {
+        int idx = arr[i] / exp;
+        count[idx % 10]++;
+    }
+
+    for (int i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+
+    for (int i = n - 1; i >= 0; i--) {
+        int idx = arr[i] / exp;
+        output[count[idx % 10] - 1] = arr[i];
+        count[idx % 10]--;
+    }
+
+    System.arraycopy(output, 0, arr, 0, n);
+}
+```
+
+## Selection Sort
+
+```java
+public static void selectionSort(int[] arr) {
+    int n = arr.length;
+
+    for (int i = 0; i < n; i++) {
+        int minIdx = i;
+
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+        }
+
+        if (minIdx != i) {
+            int temp = arr[i];
+            arr[i] = arr[minIdx];
+            arr[minIdx] = temp;
+        }
+    }
+}
+```
+
+## Shell Sort
+
+```java
+public static void shellSort(int[] arr) {
+    int n = arr.length;
+    int[] gaps = {701, 301, 132, 57, 23, 10, 4, 1};
+
+    for (int gap : gaps) {
+        for (int i = gap; i < n; i++) {
+            int tmp = arr[i];
+            int j = i;
+
+            while (j >= gap && arr[j - gap] > tmp) {
+                arr[j] = arr[j - gap];
+                j -= gap;
+            }
+
+            if (j != i) {
+                arr[j] = tmp;
+            }
+        }
+    }
+}
+```
+
+## Sleep Sort
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+
+public static int[] sleepSort(int[] arr) {
+    List<Integer> sortedArr = new ArrayList<>();
+    List<Thread> threads = new ArrayList<>();
+
+    for (int num : arr) {
+        Thread thread = new Thread(() -> snorlax(num, sortedArr));
+        threads.add(thread);
+    }
+
+    for (Thread thread : threads) {
+        thread.start();
+    }
+
+    for (Thread thread : threads) {
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return sortedArr.stream().mapToInt(i -> i).toArray();
+}
+
+public static void snorlax(int num, List<Integer> arr) {
+    try {
+        Thread.sleep(num);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    arr.add(num);
+}
+```
+
+## Tim Sort
+
+```java
+public static int[] timSort(int[] arr) {
+    int n = arr.length;
+    int minRun = 32;
+
+    for (int start = 0; start < n; start += minRun) {
+        int end = Math.min(start + minRun - 1, n - 1);
+        insertionSort(arr, start, end);
+    }
+
+    int size = minRun;
+
+    while (size < n) {
+        for (int left = 0; left < n; left += 2 * size) {
+            int mid = Math.min(n - 1, left + size - 1);
+            int right = Math.min(left + 2 * size - 1, n - 1);
+            arr = merge(arr, left, mid, right);
+        }
+        size *= 2;
+    }
+
+    return arr;
+}
+
+public static void insertionSort(int[] arr, int left, int right) {
+    for (int i = left + 1; i <= right; i++) {
+        int key = arr[i];
+        int j = i - 1;
+
+        while (j >= left && key < arr[j]) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+
+        arr[j + 1] = key;
+    }
+}
+
+public static int[] merge(int[] arr, int left, int mid, int right) {
+    int[] output = new int[right - left + 1];
+    int i = left, j = mid + 1, k = 0;
+
+    while (i <= mid && j <= right) {
+        if (arr[i] <= arr[j]) {
+            output[k++] = arr[i++];
+        } else {
+            output[k++] = arr[j++];
+        }
+    }
+
+    while (i <= mid) {
+        output[k++] = arr[i++];
+    }
+
+    while (j <= right) {
+        output[k++] = arr[j++];
+    }
+
+    System.arraycopy(output, 0, arr, left, output.length);
+    return arr;
+}
+```

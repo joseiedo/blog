@@ -1,0 +1,83 @@
+---
+title: Dynamic Programming
+description: "DP templates including top-down (memoization), bottom-up (tabulation), and Kadane's algorithm"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - dynamic-programming
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Bottom Up (Tabulation)
+
+```java
+import java.util.Arrays;
+
+
+public int fn(int[] arr) {
+    if (BASE_CASE) {
+        return 0;
+    }
+
+    int[] dp = new int[STATE_FOR_WHOLE_INPUT + 1];
+    Arrays.fill(dp, BASE_CASE);
+
+    for (int STATE = SMALLEST_SUBPROBLEM; STATE <= STATE_FOR_WHOLE_INPUT; STATE++) {
+        if (BASE_CASE) {
+            dp[STATE] = BASE_CASE;
+        } else {
+            dp[STATE] = RECURRENCE_RELATION(STATE);
+        }
+    }
+
+    return dp[STATE_FOR_WHOLE_INPUT];
+}
+```
+
+## Kadane's Algorithm
+
+```java
+public int kadane(int[] arr) {
+    int currSub = arr[0];
+    int maxSub = arr[0];
+
+    for (int i = 1; i < arr.length; i++) {
+        currSub = Math.max(currSub + arr[i], arr[i]);
+        maxSub = Math.max(maxSub, currSub);
+    }
+
+    return maxSub;
+}
+```
+
+## Top Down (Memoization)
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+
+Map<STATE, Integer> memo = new HashMap<>();
+
+public int fn(int[] arr) {
+    return dp(STATE_FOR_WHOLE_INPUT, arr);
+}
+
+public int dp(STATE, int[] arr) {
+    if (BASE_CASE) {
+        return 0;
+    }
+
+    if (memo.contains(STATE)) {
+        return memo.get(STATE);
+    }
+
+    int ans = RECURRENCE_RELATION(STATE);
+    memo.put(STATE, ans);
+    return ans;
+}
+```

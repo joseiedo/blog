@@ -1,0 +1,103 @@
+---
+title: Bit Manipulation
+description: "Common bit manipulation operations and tricks"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - bit-manipulation
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Check Power of Two
+
+```java
+public boolean isPowerOfTwo(int num) {
+    return (num & (num - 1)) == 0;
+}
+```
+
+## Clear Kth Bit
+
+```java
+public int clearKthBit(int num, int k) {
+    return num & ~(1 << k);
+}
+```
+
+## Count Set Bits
+
+```java
+public int countSetBits(int num) {
+    int count = 0;
+
+    while (num > 0) {
+        count += num & 1;
+        num >>= 1;
+    }
+
+    return count;
+}
+```
+
+## Divide by Power of Two
+
+```java
+public int divideByPowerOfTwo(int num, int k) {
+    return num >> k;
+}
+```
+
+## Get Rightmost Set Bit
+
+```java
+public int getRightmostSetBit(int num) {
+    return num & -num;
+}
+```
+
+## Multiply by Power of Two
+
+```java
+public int multiplyByPowerOfTwo(int num, int k) {
+    return num << k;
+}
+```
+
+## Set Kth Bit
+
+```java
+public int setKthBit(int num, int k) {
+    return num | (1 << k);
+}
+```
+
+## Swap Variables
+
+```java
+public int[] swapVariables(int num1, int num2) {
+    num1 ^= num2;
+    num2 ^= num1;
+    num1 ^= num2;
+    return new int[] { num1, num2 };
+}
+```
+
+## Test Kth Bit
+
+```java
+public boolean testKthBit(int num, int k) {
+    return (num & (1 << k)) != 0;
+}
+```
+
+## Toggle Kth Bit
+
+```java
+public int toggleKthBit(int num, int k) {
+    return num ^ (1 << k);
+}
+```

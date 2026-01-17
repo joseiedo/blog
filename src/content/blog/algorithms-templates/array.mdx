@@ -1,0 +1,123 @@
+---
+title: Array Patterns
+description: "Common array manipulation patterns including prefix sum, sliding window, and two pointers"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - array
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Prefix Sum
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+
+public int[] fn(int[] arr) {
+    int n = arr.length;
+    int[] prefix = new int[n];
+    prefix[0] = arr[0];
+
+    for (int i = 1; i < n; i++) {
+        prefix[i] = prefix[i - 1] + arr[i];
+    }
+
+    return prefix;
+}
+```
+
+## Sliding Window
+
+```java
+public int fn(int[] arr) {
+    int n = arr.length;
+    int window = 0;
+    int left = 0;
+    int ans = 0;
+
+    for (int right = 0; right < arr.length; right++) {
+        // TODO: add arr[right] to window
+
+        while (WINDOW_CONDITION_BROKEN) {
+            // TODO: remove arr[left] from window
+            left++;
+        }
+
+        // TODO: update ans
+    }
+
+    return ans;
+}
+```
+
+## String Building
+
+```java
+public String fn(char[] strs) {
+    StringBuilder sb = new StringBuilder();
+
+    for (char c: strs) {
+        sb.append(c);
+    }
+
+    return sb.toString();
+}
+```
+
+## Two Pointers: One Input
+
+```java
+public int fn(int[] arr) {
+    int ans = 0;
+    int left = 0;
+    int right = arr.length - 1;
+
+    while (left < right) {
+        // TODO: logic with left and right
+        if (CONDITION) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+
+    return ans;
+}
+```
+
+## Two Pointers: Two Inputs
+
+```java
+public int fn(int[] arr1, int[] arr2) {
+    int i = 0;
+    int j = 0;
+    int ans = 0;
+
+    while (i < arr1.length && j < arr2.length) {
+        // TODO: logic
+        if (CONDITION) {
+            i++;
+        } else {
+            j++;
+        }
+    }
+
+    while (i < arr1.length) {
+        // TODO: logic
+        i++;
+    }
+
+    while (j < arr2.length) {
+        // TODO: logic
+        j++;
+    }
+
+    return ans;
+}
+```

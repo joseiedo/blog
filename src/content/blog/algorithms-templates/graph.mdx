@@ -1,0 +1,303 @@
+---
+title: Graph Algorithms
+description: "Graph traversal and shortest path algorithms: BFS, DFS, Dijkstra, Bellman-Ford, Kahn's, Kruskal's, Prim's"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - graph
+  - bfs
+  - dfs
+  - shortest-path
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Bellman-Ford
+
+```java
+import java.util.Arrays;
+import java.util.List;
+
+
+public int[] bellmanFord(int n, List<int[]> edges, int source) {
+    int[] distances = new int[n];
+    Arrays.fill(distances, Integer.MAX_VALUE);
+    distances[source] = 0;
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int[] edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int w = edge[2];
+
+            if (distances[u] != Integer.MAX_VALUE && distances[u] + w < distances[v]) {
+                distances[v] = distances[u] + w;
+            }
+        }
+    }
+
+    for (int[] edge : edges) {
+        int u = edge[0];
+        int v = edge[1];
+        int w = edge[2];
+
+        if (distances[u] != Integer.MAX_VALUE && distances[u] + w < distances[v]) {
+            return new int[]{};
+        }
+    }
+
+    return distances;
+}
+```
+
+## BFS
+
+```java
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+
+public int fn(int[][] graph) {
+    Queue<Integer> que = new LinkedList<>();
+    Set<Integer> seen = new HashSet<>();
+    que.offer(START_NODE);
+    seen.add(START_NODE);
+    int ans = 0;
+
+    while (!que.isEmpty()) {
+        int node = que.remove();
+        // TODO: Logic
+        for (int neighbor: graph[node]) {
+            if (!seen.contains(neighbor)) {
+                seen.add(neighbor);
+                que.add(neighbor);
+            }
+        }
+    }
+
+    return ans;
+}
+```
+
+## DFS Iterative
+
+```java
+import java.util.Stack;
+import java.util.HashSet;
+import java.util.Set;
+
+
+public int fn(int[][] graph) {
+    Stack<Integer> stack = new Stack<>();
+    Set<Integer> seen = new HashSet<>();
+    stack.push(START_NODE);
+    seen.add(START_NODE);
+    int ans = 0;
+
+    while (!stack.empty()) {
+        int node = stack.pop();
+        // TODO: logic
+        for (int neighbor: graph[node]) {
+            if (!seen.contains(neighbor)) {
+                seen.add(neighbor);
+                stack.push(neighbor);
+            }
+        }
+    }
+
+    return ans;
+}
+```
+
+## DFS Recursive
+
+```java
+import java.util.HashSet;
+import java.util.Set;
+
+
+Set<Integer> seen = new HashSet<>();
+
+public int fn(int[][] graph) {
+    seen.add(START_NODE);
+    return dfs(START_NODE, graph);
+}
+
+public int dfs(int node, int[][] graph) {
+    int ans = 0;
+    // TODO: logic
+    for (int neighbor: graph[node]) {
+        if (!seen.contains(neighbor)) {
+            seen.add(neighbor);
+            ans += dfs(neighbor, graph);
+        }
+    }
+
+    return ans;
+}
+```
+
+## Dijkstra's Algorithm
+
+```java
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.List;
+
+
+public int[] dijkstras(List<List<int[]>> graph, int source) {
+    int n = graph.size();
+    int[] distances = new int[n];
+    Arrays.fill(distances, Integer.MAX_VALUE);
+    distances[source] = 0;
+
+    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+    pq.offer(new int[]{source, 0});
+
+    while (!pq.isEmpty()) {
+        int[] curr = pq.poll();
+        int node = curr[0];
+        int dist = curr[1];
+
+        if (dist > distances[node]) {
+            continue;
+        }
+
+        for (int[] edge : graph.get(node)) {
+            int neighbor = edge[0];
+            int weight = edge[1];
+            int newDist = dist + weight;
+
+            if (newDist < distances[neighbor]) {
+                distances[neighbor] = newDist;
+                pq.offer(new int[]{neighbor, newDist});
+            }
+        }
+    }
+
+    return distances;
+}
+```
+
+## Kahn's Algorithm (Topological Sort)
+
+```java
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
+
+public static List<Integer> kahnTopologicalSort(Map<Integer, List<Integer>> graph) {
+    List<Integer> result = new ArrayList<>();
+    Map<Integer, Integer> indegree = new HashMap<>();
+    Queue<Integer> que = new LinkedList<>();
+
+    for (List<Integer> vertices : graph.values()) {
+        for (int v : vertices) {
+            indegree.put(v, indegree.getOrDefault(v, 0) + 1);
+        }
+    }
+
+    for (Integer node : graph.keySet()) {
+        if (!indegree.containsKey(node)) {
+            que.offer(node);
+        }
+    }
+
+    while (!que.isEmpty()) {
+        int node = que.poll();
+        result.add(node);
+
+        if (graph.containsKey(node)) {
+            for (int neighbor : graph.get(node)) {
+                indegree.put(neighbor, indegree.get(neighbor) - 1);
+
+                if (indegree.get(neighbor) == 0) {
+                    que.offer(neighbor);
+                }
+            }
+        }
+    }
+
+    if (result.size() != graph.size()) {
+        return new ArrayList<>();
+    }
+
+    return result;
+}
+```
+
+## Kruskal's Algorithm (MST)
+
+```java
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+
+public List<int[]> kruskalMST(int n, List<int[]> edges) {
+    List<int[]> mst = new ArrayList<>();
+    UnionFind uf = new UnionFind(n);
+    Collections.sort(edges, (a, b) -> Integer.compare(a[0], b[0]));
+
+    for (int[] edge : edges) {
+        int weight = edge[0];
+        int u = edge[1];
+        int v = edge[2];
+
+        if (!uf.connected(u, v)) {
+            uf.union(u, v);
+            mst.add(edge);
+        }
+    }
+
+    return mst;
+}
+```
+
+## Prim's Algorithm (MST)
+
+```java
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+
+
+public List<int[]> primMST(int n, List<int[]> edges) {
+    List<int[]> mst = new ArrayList<>();
+    UnionFind uf = new UnionFind(n);
+    PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(edge -> edge[0]));
+
+    for (int[] edge : edges) {
+        pq.offer(edge);
+    }
+
+    while (!pq.isEmpty()) {
+        int[] edge = pq.poll();
+        int w = edge[0];
+        int u = edge[1];
+        int v = edge[2];
+
+        if (!uf.connected(u, v)) {
+            uf.union(u, v);
+            mst.add(edge);
+        }
+    }
+
+    return mst;
+}
+```

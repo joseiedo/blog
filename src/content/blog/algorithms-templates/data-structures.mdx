@@ -1,0 +1,717 @@
+---
+title: Data Structures
+description: "Implementations of common data structures: Array, Trees, Linked Lists, Graph, Hash Map, Trie, Union Find"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - data-structures
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## Array
+
+```java
+public class Array<T> {
+    private int size;
+    private T[] data;
+
+    @SuppressWarnings("unchecked")
+    public Array(int size) {
+        this.size = size;
+        this.data = (T[]) new Object[size];
+    }
+
+    public T get(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        return data[index];
+    }
+
+    public void set(int index, T value) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        data[index] = value;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+
+        for (int i = 0; i < size; i++) {
+            sb.append(data[i]);
+            if (i < size - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append("]");
+        return sb.toString();
+    }
+}
+```
+
+## Binary Search Tree
+
+```java
+public class TreeNode<T extends Comparable<T>> {
+    T data;
+    TreeNode<T> left;
+    TreeNode<T> right;
+
+    public TreeNode(T data) {
+        this.data = data;
+        left = null;
+        right = null;
+    }
+}
+
+public class BinarySearchTree<T extends Comparable<T>> {
+    TreeNode<T> root;
+
+    public BinarySearchTree() {
+        root = null;
+    }
+
+    public void insert(T data) {
+        root = insertNode(root, data);
+    }
+
+    private TreeNode<T> insertNode(TreeNode<T> node, T data) {
+        if (node == null) {
+            return new TreeNode<>(data);
+        }
+
+        if (data.compareTo(node.data) < 0) {
+            node.left = insertNode(node.left, data);
+        } else if (data.compareTo(node.data) > 0) {
+            node.right = insertNode(node.right, data);
+        }
+
+        return node;
+    }
+
+    @Override
+    public String toString() {
+        return root == null ? "Empty tree" : printTree(root, "", true);
+    }
+
+    private String printTree(TreeNode<T> node, String prefix, boolean isLeft) {
+        if (node == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(printTree(node.right, prefix + (isLeft ? "│   " : "    "), false));
+        sb.append(prefix).append(isLeft ? "└── " : "┌── ").append(node.data).append("\n");
+        sb.append(printTree(node.left, prefix + (isLeft ? "    " : "│   "), true));
+
+        return sb.toString();
+    }
+}
+```
+
+## Binary Tree
+
+```java
+public class TreeNode<T> {
+    T data;
+    TreeNode<T> left;
+    TreeNode<T> right;
+
+    public TreeNode(T data) {
+        this.data = data;
+        left = null;
+        right = null;
+    }
+}
+
+public class BinaryTree<T> {
+    TreeNode<T> root;
+
+    public BinaryTree() {
+        root = null;
+    }
+
+    public void insert(T data) {
+        root = insertNode(root, data);
+    }
+
+    private TreeNode<T> insertNode(TreeNode<T> node, T data) {
+        if (node == null) {
+            return new TreeNode<>(data);
+        }
+
+        if (node.left == null) {
+            node.left = new TreeNode<>(data);
+        } else if (node.right == null) {
+            node.right = new TreeNode<>(data);
+        } else {
+            node.left = insertNode(node.left, data);
+        }
+
+        return node;
+    }
+
+    @Override
+    public String toString() {
+        return root == null ? "Empty tree" : printTree(root, "", true);
+    }
+
+    private String printTree(TreeNode<T> node, String prefix, boolean isLeft) {
+        if (node == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(printTree(node.right, prefix + (isLeft ? "│   " : "    "), false));
+        sb.append(prefix).append(isLeft ? "└── " : "┌── ").append(node.data).append("\n");
+        sb.append(printTree(node.left, prefix + (isLeft ? "    " : "│   "), true));
+
+        return sb.toString();
+    }
+}
+```
+
+## Doubly Linked List
+
+```java
+public class ListNode<T> {
+    T data;
+    ListNode<T> prev;
+    ListNode<T> next;
+
+    public ListNode(T data) {
+        this.data = data;
+        prev = null;
+        next = null;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + data + "]";
+    }
+}
+
+public class DoublyLinkedList<T> {
+    ListNode<T> head;
+
+    public DoublyLinkedList() {
+        head = null;
+    }
+
+    public void append(T data) {
+        if (head == null) {
+            head = new ListNode<>(data);
+            return;
+        }
+
+        ListNode<T> curr = head;
+
+        while (curr.next != null) {
+            curr = curr.next;
+        }
+
+        ListNode<T> newNode = new ListNode<>(data);
+        curr.next = newNode;
+        newNode.prev = curr;
+    }
+
+    public void delete(T data) {
+        if (head == null) {
+            return;
+        }
+
+        if (head.data.equals(data)) {
+            head = head.next;
+            if (head != null) {
+                head.prev = null;
+            }
+            return;
+        }
+
+        ListNode<T> curr = head;
+
+        while (curr != null) {
+            if (curr.data.equals(data)) {
+                ListNode<T> prevNode = curr.prev;
+                prevNode.next = curr.next;
+                if (curr.next != null) {
+                    curr.next.prev = prevNode;
+                }
+                return;
+            }
+            curr = curr.next;
+        }
+    }
+
+    public void reverse() {
+        ListNode<T> curr = head;
+        ListNode<T> prev = null;
+
+        while (curr != null) {
+            ListNode<T> nextNode = curr.next;
+            curr.next = prev;
+            curr.prev = nextNode;
+            prev = curr;
+            curr = nextNode;
+        }
+
+        head = prev;
+    }
+
+    @Override
+    public String toString() {
+        if (head == null) {
+            return "None";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        ListNode<T> curr = head;
+
+        while (curr != null) {
+            sb.append(curr.toString()).append(" <-> ");
+            curr = curr.next;
+        }
+
+        sb.append("None");
+        return sb.toString();
+    }
+}
+```
+
+## Graph
+
+```java
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+public class Graph {
+    Map<String, List<String>> graph;
+
+    public Graph() {
+        graph = new HashMap<>();
+    }
+
+    public void addVertex(String vertex) {
+        if (!graph.containsKey(vertex)) {
+            graph.put(vertex, new ArrayList<>());
+        }
+    }
+
+    public void addEdge(String a, String b) {
+        addVertex(a);
+        addVertex(b);
+        graph.get(a).add(b);
+        graph.get(b).add(a);
+    }
+
+    public List<String> getNeighbors(String vertex) {
+        return graph.getOrDefault(vertex, new ArrayList<>());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+
+        for (Map.Entry<String, List<String>> entry : graph.entrySet()) {
+            output.append(entry.getKey()).append(" - ").append(String.join(" - ", entry.getValue())).append("\n");
+        }
+
+        return output.toString();
+    }
+}
+```
+
+## Hash Map
+
+```java
+public class HashMap {
+    private int size;
+    private Object[] bucket;
+
+    public HashMap() {
+        size = 100000;
+        bucket = new Object[size];
+    }
+
+    private int hash(int key) {
+        return key % size;
+    }
+
+    public void put(int key, Object value) {
+        bucket[hash(key)] = value;
+    }
+
+    public Object get(int key) {
+        return bucket[hash(key)];
+    }
+
+    public void remove(int key) {
+        bucket[hash(key)] = null;
+    }
+}
+```
+
+## Linked List
+
+```java
+class ListNode {
+    public int data;
+    public ListNode next;
+
+    public ListNode(int data) {
+        this.data = data;
+        this.next = null;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + data + "]";
+    }
+}
+
+class LinkedList {
+    private ListNode head;
+
+    public LinkedList() {
+        this.head = null;
+    }
+
+    public void append(int data) {
+        if (head == null) {
+            head = new ListNode(data);
+            return;
+        }
+
+        ListNode current = head;
+
+        while (current.next != null) {
+            current = current.next;
+        }
+
+        current.next = new ListNode(data);
+    }
+
+    public void delete(int data) {
+        if (head == null) {
+            return;
+        }
+
+        if (head.data == data) {
+            head = head.next;
+            return;
+        }
+
+        ListNode prev = null;
+        ListNode current = head;
+
+        while (current != null) {
+            if (current.data == data) {
+                prev.next = current.next;
+                return;
+            }
+            prev = current;
+            current = current.next;
+        }
+    }
+
+    public void reverse() {
+        ListNode prev = null;
+        ListNode current = head;
+
+        while (current != null) {
+            ListNode next = current.next;
+            current.next = prev;
+            prev = current;
+            current = next;
+        }
+
+        head = prev;
+    }
+
+    @Override
+    public String toString() {
+        if (head == null) {
+            return "None";
+        }
+
+        StringBuilder result = new StringBuilder();
+        ListNode current = head;
+
+        while (current != null) {
+            result.append(current.toString()).append(" -> ");
+            current = current.next;
+        }
+
+        result.append("None");
+        return result.toString();
+    }
+}
+```
+
+## Trie
+
+```java
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+class TrieNode {
+    Map<Character, TrieNode> children;
+    boolean isWord;
+
+    public TrieNode() {
+        this.children = new HashMap<>();
+        this.isWord = false;
+    }
+}
+
+class Trie {
+    TrieNode root;
+
+    public Trie() {
+        this.root = new TrieNode();
+    }
+
+    public void build(String[] words) {
+        for (String word : words) {
+            insert(word);
+        }
+    }
+
+    public void insert(String word) {
+        TrieNode node = root;
+
+        for (char ch : word.toCharArray()) {
+            if (!node.children.containsKey(ch)) {
+                node.children.put(ch, new TrieNode());
+            }
+            node = node.children.get(ch);
+        }
+
+        node.isWord = true;
+    }
+
+    public boolean search(String word) {
+        TrieNode node = root;
+
+        for (char ch : word.toCharArray()) {
+            if (!node.children.containsKey(ch)) {
+                return false;
+            }
+            node = node.children.get(ch);
+        }
+
+        return node.isWord;
+    }
+
+    public boolean startsWith(String prefix) {
+        TrieNode node = root;
+
+        for (char ch : prefix.toCharArray()) {
+            if (!node.children.containsKey(ch)) {
+                return false;
+            }
+            node = node.children.get(ch);
+        }
+
+        return true;
+    }
+
+    public List<String> collectWords(TrieNode node, String prefix) {
+        List<String> words = new ArrayList<>();
+
+        if (node.isWord) {
+            words.add(prefix);
+        }
+
+        for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
+            words.addAll(collectWords(entry.getValue(), prefix + entry.getKey()));
+        }
+
+        return words;
+    }
+
+    @Override
+    public String toString() {
+        return "Trie:\n" + printTrie(root, 0, null);
+    }
+
+    private String printTrie(TrieNode node, int level, String prefix) {
+        StringBuilder output = new StringBuilder();
+        String prefixStr = "\t".repeat(level) + prefix;
+
+        if (node == null) {
+            return output.toString();
+        }
+
+        if (node.isWord) {
+            output.append(prefixStr).append(" ├─ ").append("(*)").append("\n");
+        }
+
+        int i = 0;
+
+        for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
+            boolean isLast = i == node.children.size() - 1;
+            String marker = isLast ? "└─ " : "├─ ";
+            output.append(prefixStr).append(marker).append(entry.getKey()).append("\n");
+            output.append(printTrie(entry.getValue(), level + 1, isLast ? "    │" : "     "));
+            i++;
+        }
+
+        return output.toString();
+    }
+}
+```
+
+## Union Find
+
+```java
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+public class UnionFind {
+    private int[] root;
+
+    public UnionFind(int n) {
+        this.root = new int[n];
+        for (int i = 0; i < n; i++) {
+            this.root[i] = i;
+        }
+    }
+
+    public int find(int a) {
+        if (a == root[a]) {
+            return a;
+        }
+        return root[a] = find(root[a]);
+    }
+
+    public void union(int a, int b) {
+        root[find(a)] = find(b);
+    }
+
+    public boolean connected(int a, int b) {
+        return find(a) == find(b);
+    }
+
+    @Override
+    public String toString() {
+        int n = root.length;
+        List<List<Integer>> components = new ArrayList<>();
+        Map<Integer, List<Integer>> componentMap = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            int root = find(i);
+
+            if (!componentMap.containsKey(root)) {
+                componentMap.put(root, new ArrayList<>());
+            }
+
+            componentMap.get(root).add(i);
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (List<Integer> component : componentMap.values()) {
+            sb.append(" - ").append(component);
+        }
+
+        return sb.toString();
+    }
+}
+```
+
+## Union Find (Optimized with Rank)
+
+```java
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+class UnionFind {
+    int[] root;
+    int[] rank;
+
+    public UnionFind(int n) {
+        this.root = new int[n];
+        this.rank = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            this.root[i] = i;
+            this.rank[i] = 1;
+        }
+    }
+
+    public int find(int a) {
+        if (a == root[a]) {
+            return a;
+        }
+        return root[a] = find(root[a]);
+    }
+
+    public void union(int a, int b) {
+        int rootA = find(a);
+        int rootB = find(b);
+
+        if (rootA != rootB) {
+            if (rank[rootA] < rank[rootB]) {
+                root[rootA] = rootB;
+            } else if (rank[rootA] > rank[rootB]) {
+                root[rootB] = rootA;
+            } else {
+                root[rootB] = rootA;
+                rank[rootA]++;
+            }
+        }
+    }
+
+    public boolean connected(int a, int b) {
+        return find(a) == find(b);
+    }
+
+    @Override
+    public String toString() {
+        int n = root.length;
+        Map<Integer, List<Integer>> componentMap = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            int root = find(i);
+
+            if (!componentMap.containsKey(root)) {
+                componentMap.put(root, new ArrayList<>());
+            }
+
+            componentMap.get(root).add(i);
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (List<Integer> component : componentMap.values()) {
+            sb.append(" - ").append(component);
+        }
+
+        return sb.toString();
+    }
+}
+```

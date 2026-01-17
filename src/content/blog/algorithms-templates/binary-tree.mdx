@@ -1,0 +1,90 @@
+---
+title: Binary Tree
+description: "Binary tree traversal patterns using BFS and DFS (iterative and recursive)"
+date: 2026-01-16
+tags:
+  - algorithms
+  - java
+  - binary-tree
+  - bfs
+  - dfs
+image: ''
+draft: false
+authors:
+  - iedo
+---
+
+## BFS (Level Order Traversal)
+
+```java
+import java.util.LinkedList;
+import java.util.Queue;
+
+
+public int fn(TreeNode root) {
+    Queue<TreeNode> que = new LinkedList<>();
+    que.add(root);
+    int ans = 0;
+
+    while (!que.isEmpty()) {
+        int currentLength = que.size();
+        // TODO: logic for current level
+        for (int i = 0; i < currentLength; i++) {
+            TreeNode node = que.remove();
+            // TODO: logic
+            if (node.left != null) {
+                que.add(node.left);
+            }
+            if (node.right != null) {
+                que.add(node.right);
+            }
+        }
+    }
+
+    return ans;
+}
+```
+
+## DFS Iterative
+
+```java
+import java.util.Stack;
+
+
+public int dfs(TreeNode root) {
+    Stack<TreeNode> stack = new Stack<>();
+    stack.push(root);
+    int ans = 0;
+
+    while (!stack.isEmpty()) {
+        TreeNode node = stack.pop();
+        // TODO: logic
+        if (node.left != null) {
+            stack.push(node.left);
+        }
+        if (node.right != null) {
+            stack.push(node.right);
+        }
+    }
+
+    return ans;
+}
+```
+
+## DFS Recursive
+
+```java
+public int dfs(TreeNode root) {
+    if (root == null) {
+        return 0;
+    }
+
+    int ans = 0;
+
+    // TODO: logic
+    ans += dfs(root.left);
+    ans += dfs(root.right);
+
+    return ans;
+}
+```
