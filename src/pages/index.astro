@@ -14,23 +14,10 @@ const blog = await getRecentPosts(SITE.featuredPostCount)
 <Layout class="max-w-3xl">
   <PageHead slot="head" title="Home" />
   <section class="rounded-lg border">
-    <div class="p-6 grid grid-cols-1  justify-items-center sm:justify-items-end sm:grid-cols-2">
+    <div class="p-6 grid grid-cols-1  justify-items-center sm:justify-items-end s">
       <div>
         <p class="text-muted-foreground mb-2 text-sm">
-          I don't know what to write here. I started writing to see if I would
-          improve my english writing (and reasoning) skills. No idea if it's
-          working, but I think my posts are improving.
-        </p>
-        <p class="text-muted-foreground text-sm">Some facts about me:</p>
-        <ul class="text-muted-foreground mb-2 list-disc pl-5 text-sm">
-          <li>My favorite fruit is Mango</li>
-          <li>I try to draw and play guitar sometimes</li>
-          <li>I'm a Brazilian with no good social skills</li>
-        </ul>
-        <p class="text-muted-foreground mb-2 text-sm">
-          For now, I'm writing technical content that helps me or I can share
-          with another person if it's a concept I don't have energy to answer
-          again.
+        2003's developer from Brazil. I work only with web and ocassionally try random things (AI, game dev...) when the routine is boring. I will use this blog as a place to practice my writing/teaching skills.
         </p>
         <p class="text-muted-foreground mb-2 text-sm">
           You can find me on <Link
@@ -46,14 +33,6 @@ const blog = await getRecentPosts(SITE.featuredPostCount)
           >.
         </p>
       </div>
-      <Image
-        src="/me.jpg"
-        width={300}
-        height={300}
-        class="object-cover grayscale-100 brightness-80 contrast-90"
-        alt=""
-        }
-      />
     </div>
   </section>
   <section class="flex flex-col gap-y-4">
